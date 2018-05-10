@@ -10,7 +10,7 @@ credentials_data = {'ubdussamad' : ['5544781558847ecc54e3b3c406ed1c0e',True] ,
 def wrapper(method):
     @wraps(method)
     def wrapped(*args, **kwrds):
-        print("Zack Knight")
+        print("gaylord")
     return wrapped
 
 class MetaClass(type):
@@ -49,7 +49,13 @@ class utils:
         * 0,0 = Token Expired or Invalid and Non Admin/Admin 
         * NO AUTHORITY OF ADMIN IF HIS/HER TOKEN EXPIRED
         '''
-        
+        for token in tokens:
+            if time.time() - tokens[token][0] > 20:
+                del tokens[token]
+
+
+                #FAULT ABOVE
+                
         if token in tokens:
             delta = time.time() - tokens[token][0] < 20 #1 Minute(s)
             if delta:
@@ -57,8 +63,10 @@ class utils:
                     return 1,1
                 return 1,0
             return 0,0
-        else: return 0,0 
+        else: return 0,0
 
+    def doc(self):
+        return doc
         
     def list_tokens(self,token):
         if all(self.check_token(token)):
@@ -66,7 +74,7 @@ class utils:
         return("Acess Denied! Non-Eligible or Expired Token.")
 
 doc = '''This is a XML-RPC based Client Server for general method calls with high efficiency and low hastle.
-<br /> Copyright 2018 BachmanitY Inc.'''
+\n Copyright 2018 BachmanitY Inc.'''
 
 server = SimpleXMLRPCServer(("192.168.1.102", 8000))
 DocXMLRPCServer.set_server_title(server,server_title='BachmanitY Inc. Servers')
