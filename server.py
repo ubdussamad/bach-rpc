@@ -6,7 +6,7 @@ from functools import wraps
 tokens = {}
 credentials_data = {'ubdussamad' : ['5544781558847ecc54e3b3c406ed1c0e',True] , #Dummy Credentials for
                     'makshuf' : ['ccee66ac39ce8f6f4f2c450679f90525',False]  }  #Client-Side Testing
-host  =("192.168.1.102", 8000)
+host  =("localhost", 8000)
 def wrapper(method):
     @wraps(method)
     def wrapped(*args, **kwrds):
@@ -25,7 +25,7 @@ class MetaClass(type):
         return type.__new__(meta, classname, bases, newClassDict)
 
 
-class utils:
+class utils(object):
     def __init__(self):
         self.key = 0x00000
         
@@ -52,7 +52,7 @@ class utils:
         '''
 
         if token in tokens:
-            delta = time.time() - tokens[token][0] < 60 #1 Minute(s)
+            delta = time.time() - tokens[token][0] < 60 # Second(s)
             if delta:
                 if tokens[token][1]:
                     return 1,1
@@ -86,4 +86,4 @@ server.register_instance( utils() )
 try:
     server.serve_forever()
 except KeyboardInterrupt:
-    print("Shutting Down the server.")
+    print("Server Haulted.")
