@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from xmlrpc.server import *
 import hashlib,time
 from types import FunctionType
@@ -6,7 +7,9 @@ from functools import wraps
 tokens = {}
 credentials_data = {'ubdussamad' : ['5544781558847ecc54e3b3c406ed1c0e',True] , #Dummy Credentials for
                     'makshuf' : ['ccee66ac39ce8f6f4f2c450679f90525',False]  }  #Client-Side Testing
+session_timeout = 60 #Second(s)
 host  =("localhost", 8000)
+
 def wrapper(method):
     @wraps(method)
     def wrapped(*args, **kwrds):
@@ -52,7 +55,7 @@ class utils(object):
         '''
 
         if token in tokens:
-            delta = time.time() - tokens[token][0] < 60 # Second(s)
+            delta = time.time() - tokens[token][0] < session_timeout # Second(s)
             if delta:
                 if tokens[token][1]:
                     return 1,1
@@ -68,6 +71,8 @@ class utils(object):
         if all(self.check_token(token)):
             return(tokens)
         return("Acess Denied! Non-Eligible or Expired Token.")
+    def methods(self):
+        return [i for i in utils.__dict__ if not i.startswith('_')]
 
 doc = '''This is a XML-RPC based Client Server for general method calls with high efficiency and low hastle.
 \n Copyright 2018 BachmanitY Inc.'''
