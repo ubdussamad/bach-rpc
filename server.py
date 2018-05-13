@@ -5,30 +5,48 @@ from types import FunctionType
 from functools import wraps
 
 tokens = {}
-credentials_data = {'ubdussamad' : ['5544781558847ecc54e3b3c406ed1c0e',True] , #Dummy Credentials for
-                    'makshuf' : ['ccee66ac39ce8f6f4f2c450679f90525',False]  }  #Client-Side Testing
-session_timeout = 60 #Second(s)
+credentials_data = {'ubdussamad' : ['5544781558847ecc54e3b3c406ed1c0e',True] , # Dummy Credentials for
+                    'makshuf' : ['ccee66ac39ce8f6f4f2c450679f90525',False] ,   # Client-Side Testing
+                    'test' : ['81dc9bdb52d04dc20036dbd8313ed055' , True] }
+
+session_timeout = 100 #Second(s)
 host  =("localhost", 8000)
 
-def wrapper(method):
-    @wraps(method)
-    def wrapped(*args, **kwrds):
-        print("NotImplimented")
-        #TODO Further pre method processing block
-    return wrapped
+def clear_token_cache():#This job is sheduled at every method call
+    print("Garbage Collector Initialized!")
+    redundant_tokens = []
+    for token in tokens:
+        print(tokens[token][1])
+        if time.time() - tokens[token][1] < session_timeout:
+            redundant_tokens.append(token)
+    for i in redundant_tokens:
+        print("Deleted Tokens")
+        del tokens[i]
 
-class MetaClass(type):
-    def __new__(meta, classname, bases, classDict):
-        newClassDict = {}
-        for attributeName, attribute in classDict.items():
-            if isinstance(attribute, FunctionType):
-                # should replace it with a wrapped version
-                attribute = wrapper(attribute)
-            newClassDict[attributeName] = attribute
-        return type.__new__(meta, classname, bases, newClassDict)
+def my_decorator(func):
+	def time_wrapper(*args,**kwargs):
+		clear_token_cache()
+		z = func(*args,**kwargs)
+		return z
+	return time_wrapper
 
 
+
+def for_all_methods(decorator):
+    def decorate(cls):
+        for attr in cls.__dict__: # there's propably a better way to do this
+            if callable(getattr(cls, attr)):
+                setattr(cls, attr, decorator(getattr(cls, attr)))
+        return cls
+    return decorate
+
+
+
+
+
+@for_all_methods(my_decorator)
 class utils(object):
+    
     def __init__(self):
         self.key = 0x00000
         
@@ -43,8 +61,8 @@ class utils(object):
             return token,time.ctime()
         else:
             print("Zero Login")
-            return 'Bad Credentials'
-        
+            return 1,'Bad Credentials'
+
     def check_token(self,token):
         '''
         Codes:
@@ -55,7 +73,7 @@ class utils(object):
         '''
 
         if token in tokens:
-            delta = time.time() - tokens[token][0] < session_timeout # Second(s)
+            delta = time.time() - tokens[token][0] < session_timeout
             if delta:
                 if tokens[token][1]:
                     return 1,1
@@ -63,21 +81,28 @@ class utils(object):
             return 0,0
         else: return 0,0
 
+    def logout(self,token):
+        if token in tokens:
+            del tokens[token]
+            return 0,'Session Discarded.'
+        return 1,'Non-Exsistance or Expired token.'
+
     def doc(self):
-        return doc
+        return doc,tokens
         
     def list_tokens(self,token):
         
         if all(self.check_token(token)):
             return(tokens)
-        return("Acess Denied! Non-Eligible or Expired Token.")
+        return(1,"Acess Denied! Non-Eligible or Expired Token.")
+    
     def methods(self):
         return [i for i in utils.__dict__ if not i.startswith('_')]
 
 doc = '''This is a XML-RPC based Client Server for general method calls with high efficiency and low hastle.
 \n Copyright 2018 BachmanitY Inc.'''
 
-server = SimpleXMLRPCServer(host)
+server = SimpleXMLRPCServer(host,allow_none=True)
 DocXMLRPCServer.set_server_title(server,server_title='BachmanitY Inc. Servers')
 DocXMLRPCServer.set_server_name(server,server_name='Client Server Network BachmanitY Inc.')
 DocXMLRPCServer.set_server_documentation(server,server_documentation=doc)

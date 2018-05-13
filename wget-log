@@ -1,0 +1,10 @@
+--2018-05-13 17:31:10--  http://www.voidspace.org.uk/python/articles/metaclasses.shtml
+Resolving www.voidspace.org.uk (www.voidspace.org.uk)... 207.38.86.245
+Connecting to www.voidspace.org.uk (www.voidspace.org.uk)|207.38.86.245|:80... connected.
+HTTP request sent, awaiting response... Read error (Connection timed out) in headers.
+Retrying.
+
+--2018-05-13 17:46:13--  (try: 2)  http://www.voidspace.org.uk/python/articles/metaclasses.shtml
+Connecting to www.voidspace.org.uk (www.voidspace.org.uk)|207.38.86.245|:80... failed: Network is unreachable.
+Resolving www.voidspace.org.uk (www.voidspace.org.uk)... failed: Temporary failure in name resolution.
+wget: unable to resolve host address ‘www.voidspace.org.uk’
