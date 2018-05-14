@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 from xmlrpc.server import *
 import hashlib,time
-from types import FunctionType
-from functools import wraps
+from lib.decorator import *
 
 tokens = {}
 credentials_data = {'ubdussamad' : ['5544781558847ecc54e3b3c406ed1c0e',True] , # Dummy Credentials for
@@ -12,39 +11,17 @@ credentials_data = {'ubdussamad' : ['5544781558847ecc54e3b3c406ed1c0e',True] , #
 session_timeout = 100 #Second(s)
 host  =("localhost", 8000)
 
-def clear_token_cache():#This job is sheduled at every method call
-    print("Garbage Collector Initialized!")
+def clear_token_cache():#This is a least effort solution to the garbage collector problem
+    '''This method is to to called at every administrativew method call'''
     redundant_tokens = []
     for token in tokens:
-        print(tokens[token][1])
         if time.time() - tokens[token][1] < session_timeout:
             redundant_tokens.append(token)
     for i in redundant_tokens:
-        print("Deleted Tokens")
         del tokens[i]
 
-def my_decorator(func):
-	def time_wrapper(*args,**kwargs):
-		clear_token_cache()
-		z = func(*args,**kwargs)
-		return z
-	return time_wrapper
 
-
-
-def for_all_methods(decorator):
-    def decorate(cls):
-        for attr in cls.__dict__: # there's propably a better way to do this
-            if callable(getattr(cls, attr)):
-                setattr(cls, attr, decorator(getattr(cls, attr)))
-        return cls
-    return decorate
-
-
-
-
-
-@for_all_methods(my_decorator)
+@for_all_methods(my_decorator(clear_token_cache))
 class utils(object):
     
     def __init__(self):
