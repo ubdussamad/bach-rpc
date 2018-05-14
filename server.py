@@ -4,15 +4,15 @@ import hashlib,time
 from lib.decorator import *
 
 tokens = {}
-credentials_data = {'ubdussamad' : ['5544781558847ecc54e3b3c406ed1c0e',True] , # Dummy Credentials for
-                    'makshuf' : ['ccee66ac39ce8f6f4f2c450679f90525',False] ,   # Client-Side Testing
-                    'test' : ['81dc9bdb52d04dc20036dbd8313ed055' , True] }
+credentials_data = {'ubdussamad' : ['5544781558847ecc54e3b3c406ed1c0e',True, 101] , # Dummy Credentials for
+                    'makshuf' : ['ccee66ac39ce8f6f4f2c450679f90525',False, 102 ] ,   # Client-Side Testing
+                    'test' : ['81dc9bdb52d04dc20036dbd8313ed055' , True, 103 ] }
 
 session_timeout = 100 #Second(s)
 host  =("localhost", 8000)
 
 def clear_token_cache():#This is a least effort solution to the garbage collector problem
-    '''This method is to to called at every administrativew method call'''
+    '''This method is to to called at every administrative method call'''
     redundant_tokens = []
     for token in tokens:
         if time.time() - tokens[token][1] < session_timeout:
