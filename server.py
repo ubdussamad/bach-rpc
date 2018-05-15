@@ -76,6 +76,21 @@ class utils(object):
     def methods(self):
         return [i for i in utils.__dict__ if not i.startswith('_')]
 
+    def check_users(self,token):
+        if all(self.check_token(token)):
+            return(credentials_data)
+        return(1,"Acess Denied! Non-Eligible or Expired Token.")
+
+    def register(self,usr,pwd):
+        if usr not in credentials_data:
+            last_user_id = max([ credentials_data[usr][2] for usr in credentials_data])
+            credentials_data[usr] = [hashlib.md5(pwd.encode('utf-8')).hexdigest(), False , last_user_id+1]
+            return "User %s Created, You may login using the given credentials."%(usr,)
+        else:
+            return "Username Already Exists, Please try a different username."
+    
+            
+
 doc = '''This is a XML-RPC based Client Server for general method calls with high efficiency and low hastle.
 \n Copyright 2018 BachmanitY Inc.'''
 
