@@ -1,4 +1,4 @@
-# bach-rpc
+# Bach-rpc
 Simple XML-RPC Server for BACH
 
 # Introduction
