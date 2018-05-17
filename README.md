@@ -8,7 +8,7 @@ It uses the Python implimentation of XML RPC server and a Client.
 
 * Navigate to the clone or extracted directory in terminal
 
-* Type: [code] python3 server.py [/code]
+* Type: `python3 server.py`
 
 * You've started the server.
 
