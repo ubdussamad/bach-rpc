@@ -30,7 +30,7 @@ session_timeout = 100 #Second(s)
 host  =("0.0.0.0", 8090)
 
 def clear_token_cache():#This is a least effort solution to the garbage collector problem
-    '''This method is to to called at every administrative method call'''
+    '''This method is to to called at every administrative method call *needs improvement'''
     redundant_tokens = []
     for token in tokens:
         if time.time() - tokens[token][1] < session_timeout:
