@@ -7,8 +7,18 @@ tokens = {}
 
 
 def credentials_data(write=False,credentials=[]):
-    with open('credentials.json','r') as f_obj:
-        current_data = json.load(f_obj)
+    try:
+        with open('credentials.json','r') as f_obj:
+            current_data = json.load(f_obj)
+    except IOError:
+        temp   = {'admin':[hashlib.md5('1234'.encode('utf-8')).hexdigest(), True , 101]}
+        f = open('credentials.json','w+')
+        json.dump(temp,f)
+        f.close()
+        f = open('credentials.json','r')
+        current_data = json.load(f)
+        f.close()
+        
     if write:
         with open('credentials.json','w') as f_obj:
             last_user_id = max([ current_data[usr][2] for usr in current_data])
