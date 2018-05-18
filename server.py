@@ -1,15 +1,23 @@
 #!/usr/bin/env python3
 from xmlrpc.server import *
-import hashlib,time
+import hashlib,time,json
 from lib.decorator import *
 
 tokens = {}
-credentials_data = {'ubdussamad' : ['5544781558847ecc54e3b3c406ed1c0e',True, 101] , # Dummy Credentials for
-                    'makshuf' : ['ccee66ac39ce8f6f4f2c450679f90525',False, 102 ] ,   # Client-Side Testing
-                    'test' : ['81dc9bdb52d04dc20036dbd8313ed055' , True, 103 ] }
 
+
+def credentials_data(write=False,credentials=[]):
+    with open('credentials.json','r') as f_obj:
+        current_data = json.load(f_obj)
+    if write:
+        with open('credentials.json','w') as f_obj:
+            last_user_id = max([ current_data[usr][2] for usr in current_data])
+            current_data[credentials[0]] = [hashlib.md5(credentials[1].encode('utf-8')).hexdigest(), False , last_user_id+1]
+            json.dump(current_data,f_obj)
+            return(0)
+    return current_data
 session_timeout = 100 #Second(s)
-host  =("localhost", 8000)
+host  =("0.0.0.0", 8090)
 
 def clear_token_cache():#This is a least effort solution to the garbage collector problem
     '''This method is to to called at every administrative method call'''
@@ -29,12 +37,12 @@ class utils(object):
         
     def login(self,usr,pwd):
         
-        credentials = 1 if usr in credentials_data else None
-        if credentials and hashlib.md5(pwd.encode('utf-8')).hexdigest() == credentials_data[usr][0] :
+        credentials = 1 if usr in credentials_data() else None
+        if credentials and hashlib.md5(pwd.encode('utf-8')).hexdigest() == credentials_data()[usr][0] :
             
             token = hashlib.md5(str(time.time()).encode('utf-8')).hexdigest()[:7]
-            tokens[token] = [time.time(),1 if credentials_data[usr][1] else 0]
-            print( "Master Login!" if credentials_data[usr][1] else 'User_Login!')
+            tokens[token] = [time.time(),1 if credentials_data()[usr][1] else 0]
+            print( "Master Login!" if credentials_data()[usr][1] else 'User_Login!')
             return token,time.ctime()
         else:
             print("Zero Login")
@@ -78,13 +86,18 @@ class utils(object):
 
     def check_users(self,token):
         if all(self.check_token(token)):
-            return(credentials_data)
+            return(credentials_data())
         return(1,"Acess Denied! Non-Eligible or Expired Token.")
+    def change_pwd(self,usr,pwd,new_pwd):
+        credentials = 1 if usr in credentials_data() else None
+        if credentials and hashlib.md5(pwd.encode('utf-8')).hexdigest() == credentials_data()[usr][0] :
+            credentials_data(True,[usr,new_pwd])
+            return('Your password was sucessfully updated.')
+        return('Bad Credentials')
 
     def register(self,usr,pwd):
-        if usr not in credentials_data:
-            last_user_id = max([ credentials_data[usr][2] for usr in credentials_data])
-            credentials_data[usr] = [hashlib.md5(pwd.encode('utf-8')).hexdigest(), False , last_user_id+1]
+        if usr not in credentials_data():
+            credentials_data(True,[usr,pwd])
             return "User %s Created, You may login using the given credentials."%(usr,)
         else:
             return "Username Already Exists, Please try a different username."
