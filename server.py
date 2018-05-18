@@ -22,7 +22,7 @@ def credentials_data(write=False,credentials=[]):
     if write:
         with open('credentials.json','w') as f_obj:
             last_user_id = max([ current_data[usr][2] for usr in current_data])
-            current_data[credentials[0]] = [hashlib.md5(credentials[1].encode('utf-8')).hexdigest(), False , last_user_id+1]
+            current_data[credentials[0]] = [hashlib.md5(credentials[1].encode('utf-8')).hexdigest(), credentials[2] , last_user_id+1]
             json.dump(current_data,f_obj)
             return(0)
     return current_data
@@ -101,7 +101,7 @@ class utils(object):
     def change_pwd(self,usr,pwd,new_pwd):
         credentials = 1 if usr in credentials_data() else None
         if credentials and hashlib.md5(pwd.encode('utf-8')).hexdigest() == credentials_data()[usr][0] :
-            credentials_data(True,[usr,new_pwd])
+            credentials_data(True,[usr,new_pwd,credentials_data()[usr][1]])
             return('Your password was sucessfully updated.')
         return('Bad Credentials')
 
