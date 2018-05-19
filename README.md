@@ -14,7 +14,7 @@ It uses the Python implimentation of XML RPC server and a Client.
 
 * Now open an Interactive session in python with the **client.py** file.
 
-* Type `data = xmlrpc.login('test','1234')`
+* Type `data = xmlrpc.login('admin','1234')`
 
 * Other methods can be deduced from the code.
 
