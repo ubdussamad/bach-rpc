@@ -1,33 +1,40 @@
 #!/usr/bin/env python3
 from xmlrpc.server import *
-import hashlib,time,json
+import hashlib,time,os,json
 from lib.decorator import *
 
 tokens = {}
-
+session_timeout = 100 #Second(s)
+host  =("0.0.0.0", 8090)
 
 def credentials_data(write=False,credentials=[]):
+    jtp = lambda x: os.path.dirname(x) #Jump to the parent directory
+    cred_dir = os.path.join(jtp(jtp(os.path.realpath(__file__))),'asrar/')
+    if not os.path.exists(cred_dir):
+        os.makedirs(cred_dir)
+    cred_path = os.path.join(cred_dir,'asrar.json')
+
     try:
-        with open('credentials.json','r') as f_obj:
+        with open(cred_path,'r') as f_obj:
             current_data = json.load(f_obj)
-    except IOError:
+    except:
         temp   = {'admin':[hashlib.md5('1234'.encode('utf-8')).hexdigest(), True , 101]}
-        f = open('credentials.json','w+')
+        f = open(cred_path,'w')
         json.dump(temp,f)
         f.close()
-        f = open('credentials.json','r')
+        f = open(cred_path,'r')
         current_data = json.load(f)
         f.close()
         
     if write:
-        with open('credentials.json','w') as f_obj:
+        with open(cred_path,'w') as f_obj:
             last_user_id = max([ current_data[usr][2] for usr in current_data])
             current_data[credentials[0]] = [hashlib.md5(credentials[1].encode('utf-8')).hexdigest(), credentials[2] , last_user_id+1]
             json.dump(current_data,f_obj)
             return(0)
     return current_data
-session_timeout = 100 #Second(s)
-host  =("0.0.0.0", 8090)
+
+
 
 def clear_token_cache():#This is a least effort solution to the garbage collector problem
     '''This method is to to called at every administrative method call *needs improvement'''
@@ -105,9 +112,9 @@ class utils(object):
             return('Your password was sucessfully updated.')
         return('Bad Credentials')
 
-    def register(self,usr,pwd):
+    def register(self,usr,pwd,auth=0):
         if usr not in credentials_data():
-            credentials_data(True,[usr,pwd])
+            credentials_data(True,[usr,pwd,auth])
             return "User %s Created, You may login using the given credentials."%(usr,)
         else:
             return "Username Already Exists, Please try a different username."
