@@ -2,11 +2,11 @@
 from xmlrpc.server import *
 import hashlib,time,os,json
 from lib.decorator import *
-
 tokens = {}
-session_timeout = 100 #Second(s)
+session_timeout = 600 #Second(s)
 host  =("0.0.0.0", 8090)
 
+@time_wrapper
 def credentials_data(write=False,credentials=[]):
     jtp = lambda x: os.path.dirname(x) #Jump to the parent directory
     cred_dir = os.path.join(jtp(jtp(os.path.realpath(__file__))),'asrar/')
@@ -40,11 +40,12 @@ def clear_token_cache():#This is a least effort solution to the garbage collecto
     '''This method is to to called at every administrative method call *needs improvement'''
     redundant_tokens = []
     for token in tokens:
-        if time.time() - tokens[token][1] < session_timeout:
+        print('time delta is: %f'%(time.time() - tokens[token][0],))
+        print('session to: %d'%(session_timeout,))
+        if time.time() - tokens[token][0] > session_timeout:
             redundant_tokens.append(token)
     for i in redundant_tokens:
         del tokens[i]
-
 
 @for_all_methods(my_decorator(clear_token_cache))
 class utils(object):
@@ -53,14 +54,14 @@ class utils(object):
         self.key = 0x00000
         
     def login(self,usr,pwd):
-        
-        credentials = 1 if usr in credentials_data() else None
-        if credentials and hashlib.md5(pwd.encode('utf-8')).hexdigest() == credentials_data()[usr][0] :
+        credentials = credentials_data()
+        pre_user = 1 if usr in credentials else None
+        if pre_user and hashlib.md5(pwd.encode('utf-8')).hexdigest() == credentials[usr][0] :
             
             token = hashlib.md5(str(time.time()).encode('utf-8')).hexdigest()[:7]
-            tokens[token] = [time.time(),1 if credentials_data()[usr][1] else 0]
-            print( "Master Login!" if credentials_data()[usr][1] else 'User_Login!')
-            return token,time.ctime()
+            tokens[token] = [time.time(),1 if credentials[usr][1] else 0]
+            print( "Master Login!" if credentials[usr][1] else 'User_Login!')
+            return 0,token,time.ctime()
         else:
             print("Zero Login")
             return 1,'Bad Credentials'
@@ -95,7 +96,7 @@ class utils(object):
     def list_tokens(self,token):
         
         if all(self.check_token(token)):
-            return(tokens)
+            return(0,tokens)
         return(1,"Acess Denied! Non-Eligible or Expired Token.")
     
     def methods(self):
@@ -103,21 +104,21 @@ class utils(object):
 
     def check_users(self,token):
         if all(self.check_token(token)):
-            return(credentials_data())
+            return(0,credentials_data())
         return(1,"Acess Denied! Non-Eligible or Expired Token.")
     def change_pwd(self,usr,pwd,new_pwd):
         credentials = 1 if usr in credentials_data() else None
         if credentials and hashlib.md5(pwd.encode('utf-8')).hexdigest() == credentials_data()[usr][0] :
             credentials_data(True,[usr,new_pwd,credentials_data()[usr][1]])
-            return('Your password was sucessfully updated.')
-        return('Bad Credentials')
+            return(0,'Your password was sucessfully updated.')
+        return(1,'Bad Credentials')
 
     def register(self,usr,pwd,auth=0):
         if usr not in credentials_data():
             credentials_data(True,[usr,pwd,auth])
-            return "User %s Created, You may login using the given credentials."%(usr,)
+            return 0,"User %s Created, You may login using the given credentials."%(usr,)
         else:
-            return "Username Already Exists, Please try a different username."
+            return 1,"Username Already Exists, Please try a different username."
     
             
 

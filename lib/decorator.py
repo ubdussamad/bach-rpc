@@ -19,4 +19,13 @@ def for_all_methods(decorator):
         return cls
     return decorate
 
+import time
+
+def time_wrapper(func):
+    def wrapee(*args,**kwargs):
+        epoch = time.time()
+        obj = func(*args,**kwargs)
+        print('Time delta: %f'%(time.time()-epoch,))
+        return obj
+    return wrapee
 
