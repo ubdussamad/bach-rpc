@@ -1,38 +1,45 @@
 #!/usr/bin/env python3
 from xmlrpc.server import *
-import hashlib,time,os,json
-from lib.decorator import *
+import time,os,json
+from hashlib import md5
+import hashlib
+try:
+    from lib.decorator import *
+except:
+    from decorator import *
 tokens = {}
 session_timeout = 600 #Second(s)
 host  =("0.0.0.0", 8090)
 
-@time_wrapper
-def credentials_data(write=False,credentials=[]):
-    jtp = lambda x: os.path.dirname(x) #Jump to the parent directory
-    cred_dir = os.path.join(jtp(jtp(os.path.realpath(__file__))),'asrar/')
-    if not os.path.exists(cred_dir):
-        os.makedirs(cred_dir)
-    cred_path = os.path.join(cred_dir,'asrar.json')
 
-    try:
-        with open(cred_path,'r') as f_obj:
-            current_data = json.load(f_obj)
-    except:
-        temp   = {'admin':[hashlib.md5('1234'.encode('utf-8')).hexdigest(), True , 101]}
-        f = open(cred_path,'w')
-        json.dump(temp,f)
-        f.close()
-        f = open(cred_path,'r')
-        current_data = json.load(f)
-        f.close()
-        
-    if write:
-        with open(cred_path,'w') as f_obj:
-            last_user_id = max([ current_data[usr][2] for usr in current_data])
-            current_data[credentials[0]] = [hashlib.md5(credentials[1].encode('utf-8')).hexdigest(), credentials[2] , last_user_id+1]
-            json.dump(current_data,f_obj)
+class data(object):
+    def __init__(self):
+        self.file = os.path.join(os.path.dirname(os.path.dirname(
+            os.path.realpath(__file__))),os.path.join('data','asrar.txt'))
+
+        if not os.path.exists(self.file):
+            directory = os.path.dirname(self.file)
+            if not os.path.exists(directory):
+                os.mkdir(directory)
+            with open(self.file,'w') as f_obj:
+                    f_obj.write('admin,81dc9bdb52d04dc20036dbd8313ed055,1,101\n')
+
+        with open(self.file,'r') as f_obj:
+            data = f_obj.read()
+            data = [i for i in data.split('\n') if i]
+            keys = [i.split(',')[0] for i in data]
+            values = [i.split(',')[1:] for i in data]
+            self.credentials = dict(zip(keys, values))
+
+    def append(self,data):
+        with open(self.file,'a') as f_obj:
+            new_user_id = max([int(self.credentials[usr][2]) for usr in self.credentials])
+            f_obj.write(','.join([data[0],md5(data[1].encode('utf-8')).hexdigest(),data[2],str(new_user_id+1),'\n']))
             return(0)
-    return current_data
+    def update(self,usr,pwd):
+        raise NotImplementedError
+    
+    
 
 
 
@@ -54,7 +61,7 @@ class utils(object):
         self.key = 0x00000
         
     def login(self,usr,pwd):
-        credentials = credentials_data()
+        credentials = data().credentials
         pre_user = 1 if usr in credentials else None
         if pre_user and hashlib.md5(pwd.encode('utf-8')).hexdigest() == credentials[usr][0] :
             
@@ -104,17 +111,17 @@ class utils(object):
 
     def check_users(self,token):
         if all(self.check_token(token)):
-            return(0,credentials_data())
+            return(0,data().credentials)
         return(1,"Acess Denied! Non-Eligible or Expired Token.")
     def change_pwd(self,usr,pwd,new_pwd):
-        credentials = 1 if usr in credentials_data() else None
-        if credentials and hashlib.md5(pwd.encode('utf-8')).hexdigest() == credentials_data()[usr][0] :
-            credentials_data(True,[usr,new_pwd,credentials_data()[usr][1]])
+        credentials = 1 if usr in data().credentials else None
+        if credentials and hashlib.md5(pwd.encode('utf-8')).hexdigest() == data().credentials[usr][0] :
+            data().append([usr,new_pwd,data().credentials[usr][1]])
             return(0,'Your password was sucessfully updated.')
         return(1,'Bad Credentials')
 
     def register(self,usr,pwd,auth=0):
-        if usr not in credentials_data():
+        if usr not in data().credentials:
             credentials_data(True,[usr,pwd,auth])
             return 0,"User %s Created, You may login using the given credentials."%(usr,)
         else:

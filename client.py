@@ -13,7 +13,7 @@ try:
         token = str(a[1])
     else: raise
 except:
-    print("Login test: Fail!")
+    print("Login test: Fail5!")
 
 try:
     b = xmlrpc.change_pwd('admin','1234','1234')
