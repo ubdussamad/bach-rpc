@@ -116,7 +116,7 @@ class utils(object):
     def change_pwd(self,usr,pwd,new_pwd):
         credentials = 1 if usr in data().credentials else None
         if credentials and hashlib.md5(pwd.encode('utf-8')).hexdigest() == data().credentials[usr][0] :
-            data().append([usr,new_pwd,data().credentials[usr][1]])
+            data().append([usr,new_pwd,str(data().credentials[usr][1])])
             return(0,'Your password was sucessfully updated.')
         return(1,'Bad Credentials')
 
