@@ -122,7 +122,7 @@ class utils(object):
 
     def register(self,usr,pwd,auth=0):
         if usr not in data().credentials:
-            credentials_data(True,[usr,pwd,auth])
+            data().append([usr,pwd,auth])
             return 0,"User %s Created, You may login using the given credentials."%(usr,)
         else:
             return 1,"Username Already Exists, Please try a different username."
