@@ -30,6 +30,7 @@ class data(object):
                     f_obj.write(','.join([ usr if usr else 'admin' , hexmd5(pwd) if pwd else hexmd5(1234) ,
                                   '1' , '101'])+'\n')
                     f_obj.close()
+                    print('\nAdmin Sucessfully registered, server is running.')
 
     def append(self,data):
         '''.append(self, [usrname,passwod , authentication]'''
