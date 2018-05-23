@@ -24,7 +24,7 @@ class data(object):
             directory = os.path.dirname(self.file)
             if not os.path.exists(directory):
                 os.mkdir(directory)
-            with open(self.file,'w') as f_obj: #TODO: This should be updated to ask for fresh user account
+            with open(self.file,'w') as f_obj:
                     usr = input('Setup admin username and password for the given server: \n\n Enter Username:')
                     pwd = input('\n Enter Password:')
                     f_obj.write(','.join([ usr if usr else 'admin' , hexmd5(pwd) if pwd else hexmd5(1234) ,
