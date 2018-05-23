@@ -31,9 +31,7 @@
 #  include <unistd.h>
 #endif
 
-#include <xmlrpc-c/base.h>
-#include <xmlrpc-c/server.h>
-#include <xmlrpc-c/server_abyss.h>
+#include <xmlrpc-c>
 
 #include "config.h"  /* information about this build environment */
 

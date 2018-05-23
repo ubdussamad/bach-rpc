@@ -2,18 +2,21 @@
 from xmlrpc.server import *
 import time,os,json
 from hashlib import md5
-import hashlib
 try:
     from lib.decorator import *
 except:
-    from decorator import *
+    from decorator import * #For bad magic number errors in IDLE
 tokens = {}
 session_timeout = 600 #Second(s)
 host  =("0.0.0.0", 8090)
 
+def hexmd5(x):
+    return md5(str(x).encode('utf-8')).hexdigest()
 
 class data(object):
     def __init__(self):
+        ''' Class for Reading/Writing/Appending to the
+            credentials data. '''
         self.file = os.path.join(os.path.dirname(os.path.dirname(
             os.path.realpath(__file__))),os.path.join('data','asrar.txt'))
 
@@ -21,23 +24,43 @@ class data(object):
             directory = os.path.dirname(self.file)
             if not os.path.exists(directory):
                 os.mkdir(directory)
-            with open(self.file,'w') as f_obj:
-                    f_obj.write('admin,81dc9bdb52d04dc20036dbd8313ed055,1,101\n')
-
-        with open(self.file,'r') as f_obj:
-            data = f_obj.read()
-            data = [i for i in data.split('\n') if i]
-            keys = [i.split(',')[0] for i in data]
-            values = [i.split(',')[1:] for i in data]
-            self.credentials = dict(zip(keys, values))
+            with open(self.file,'w') as f_obj: #TODO: This should be updated to ask for fresh user account
+                    usr = input('Setup admin username and password for the given server: \n\n Enter Username:')
+                    pwd = input('\n Enter Password:')
+                    f_obj.write(','.join([ usr if usr else 'admin' , hexmd5(pwd) if pwd else hexmd5(1234) ,
+                                  '1' , '101'])+'\n')
+                    f_obj.close()
 
     def append(self,data):
+        '''.append(self, [usrname,passwod , authentication]'''
         with open(self.file,'a') as f_obj:
-            new_user_id = max([int(self.credentials[usr][2]) for usr in self.credentials])
-            f_obj.write(','.join([data[0],md5(data[1].encode('utf-8')).hexdigest(),data[2],str(new_user_id+1),'\n']))
-            return(0)
-    def update(self,usr,pwd):
-        raise NotImplementedError
+            new_user_id = max([int(self.peek()[usr][2]) for usr in self.peek()])
+            f_obj.write(','.join([data[0],hexmd5(data[1]),str(data[2]),str(new_user_id+1),'\n']))
+            f_obj.close()
+        return(0)
+    def update(self,data):
+        '''.append(self, [usrname,new_password, authentication, user_id]'''
+        assert len(data) == 4
+        f_obj = open(self.file,'r')
+        file = f_obj.readlines()
+        f_obj.close()
+        f_obj = open(self.file,'w')
+        index = int(data[3])-101
+        for i,j in enumerate(file):
+            if i==index:
+                f_obj.write(','.join(map(str,data))+'\n')
+            else:
+                f_obj.write(j)
+        f_obj.close()
+        return([0])
+
+    def peek(self):
+        with open(self.file,'r') as f_obj:
+            data = f_obj.read()
+            data = [[j for j in i.split(',') if j] for i in data.split('\n') if i]
+            self.cred_dict = dict([(i[0],i[1:]) for i in data])
+            f_obj.close()
+        return self.cred_dict
     
     
 
@@ -47,8 +70,6 @@ def clear_token_cache():#This is a least effort solution to the garbage collecto
     '''This method is to to called at every administrative method call *needs improvement'''
     redundant_tokens = []
     for token in tokens:
-        print('time delta is: %f'%(time.time() - tokens[token][0],))
-        print('session to: %d'%(session_timeout,))
         if time.time() - tokens[token][0] > session_timeout:
             redundant_tokens.append(token)
     for i in redundant_tokens:
@@ -59,18 +80,17 @@ class utils(object):
     
     def __init__(self):
         self.key = 0x00000
+        self.credentials = data()
         
     def login(self,usr,pwd):
-        credentials = data().credentials
-        pre_user = 1 if usr in credentials else None
-        if pre_user and hashlib.md5(pwd.encode('utf-8')).hexdigest() == credentials[usr][0] :
+        pre_user = 1 if usr in self.credentials.peek() else None
+        if pre_user and hexmd5(pwd) == self.credentials.peek()[usr][0] :
             
-            token = hashlib.md5(str(time.time()).encode('utf-8')).hexdigest()[:7]
-            tokens[token] = [time.time(),1 if credentials[usr][1] else 0]
-            print( "Master Login!" if credentials[usr][1] else 'User_Login!')
+            token = hexmd5(time.time())[:7]
+            tokens[token] = [time.time(),1 if self.credentials.peek()[usr][1] else 0]
+            print( "Master Login!" if self.credentials.peek()[usr][1] else '')
             return 0,token,time.ctime()
         else:
-            print("Zero Login")
             return 1,'Bad Credentials'
 
     def check_token(self,token):
@@ -111,18 +131,18 @@ class utils(object):
 
     def check_users(self,token):
         if all(self.check_token(token)):
-            return(0,data().credentials)
+            return(0,self.credentials.peek())
         return(1,"Acess Denied! Non-Eligible or Expired Token.")
     def change_pwd(self,usr,pwd,new_pwd):
-        credentials = 1 if usr in data().credentials else None
-        if credentials and hashlib.md5(pwd.encode('utf-8')).hexdigest() == data().credentials[usr][0] :
-            data().append([usr,new_pwd,str(data().credentials[usr][1])])
+        credentials = 1 if usr in self.credentials.peek() else None
+        if credentials and hexmd5(pwd) == self.credentials.peek()[usr][0] :
+            self.credentials.update(  [usr,hexmd5(new_pwd)]+self.credentials.peek()[usr][1:] )
             return(0,'Your password was sucessfully updated.')
         return(1,'Bad Credentials')
 
     def register(self,usr,pwd,auth=0):
-        if usr not in data().credentials:
-            data().append([usr,pwd,auth])
+        if usr not in self.credentials.peek():
+            self.credentials.append([usr,pwd,auth])
             return 0,"User %s Created, You may login using the given credentials."%(usr,)
         else:
             return 1,"Username Already Exists, Please try a different username."

@@ -3,7 +3,7 @@ from xmlrpc.client import *
 transport = Transport()
 transport.user_agent = 'DeerdhPro2'
 import random
-xmlrpc = ServerProxy('http://13.126.93.123:8090/',
+xmlrpc = ServerProxy('http://localhost:8090/',
                                   allow_none=True, transport=transport)
 token = 0
 try:
@@ -12,15 +12,16 @@ try:
         print("Login test: Pass!")
         token = str(a[1])
     else: raise
-except:
-    print("Login test: Fail5!")
+except Exception as err:
+    print("Login test: Fail5!",err)
 
 try:
     b = xmlrpc.change_pwd('admin','1234','1234')
     if not b[0]: print("Change key: Pass!")
     else: raise
-except:
+except Exception as err:
     print("Change key: Fail!")
+    print(err)
 
 try:
     j = lambda: [random.randint(97,122) for i in range(8)]
