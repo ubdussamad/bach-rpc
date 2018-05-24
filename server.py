@@ -35,6 +35,7 @@ class data(object):
     def append(self,data):
         '''.append(self, [usrname,password , authentication]'''
         with open(self.file,'a') as f_obj:
+            print('Auth is:',data[2])
             new_user_id = max([int(self.peek()[usr][2]) for usr in self.peek()])
             f_obj.write(','.join([data[0],hexmd5(data[1]),str(data[2]),str(new_user_id+1),'\n']))
             f_obj.close()
@@ -56,7 +57,24 @@ class data(object):
         f_obj.close()
         return([0])
 
+    def delete(self,usr_id):
+        '''.delete(self,user_id)'''
+        #It never really deletes the data, it just overwrites it thus declaring it unused
+        f_obj = open(self.file,'r')
+        file = f_obj.readlines()
+        f_obj.close()
+        f_obj = open(self.file,'w')
+        index = int(usr_id)-101
+        for i,j in enumerate(file):
+            if i==index:
+                f_obj.write( ','.join([str(usr_id),'NULL','NULL',str(usr_id)]) +'\n')
+            else:
+                f_obj.write(j)
+        f_obj.close()
+        return([0])
+
     def peek(self):
+        ''' Retuns dict e.g: {'usr':[pwd_hash,auth,usr_id]} '''
         with open(self.file,'r') as f_obj:
             data = f_obj.read()
             data = [[j for j in i.split(',') if j] for i in data.split('\n') if i]
@@ -74,6 +92,7 @@ class utils(object):
         self.credentials = data()
         self.__tokens = {} #Tokens are stored in volatile memory as to log everyone out at server shutdown.
 
+
     def clear_token_cache(self,user_id=''):
         '''Removes Expired Tokens from the memory and also removed pre-exsistant tokens of a user.'''
         if user_id:
@@ -89,7 +108,7 @@ class utils(object):
                 redundant_tokens.append(token)
         for i in redundant_tokens:
             del tokens[i]
-            
+
     def login(self,usr,pwd):
         temp = self.credentials.peek()
         pre_user = 1 if usr in temp else None
@@ -122,6 +141,7 @@ class utils(object):
             return 0,0
         else: return 0,0
 
+
     def logout(self,token):
         if token in self.__tokens:
             del self.__tokens[token]
@@ -130,7 +150,7 @@ class utils(object):
 
     def doc(self):
         return doc
-        
+        ''
     def methods(self):
         return [i for i in utils.__dict__ if not i.startswith('_')]
 
@@ -172,6 +192,12 @@ class utils(object):
             return 0,"User %s Created, You may login using the given credentials."%(usr,)
         else:
             return 1,"Username Already Exists, Please try a different username."
+    def remove(self,token,usr,pwd):
+        if self.check_token(token)[0]:
+            self.credentials.delete(self.credentials.peek()[usr][2])
+            return(0,"User Discarded!")
+        return(1,'Denied!')
+
 
     def __list_online_users(self):
         online_users = []
