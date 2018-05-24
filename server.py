@@ -2,10 +2,7 @@
 from xmlrpc.server import *
 import time,os,json
 from hashlib import md5
-try:
-    from lib.decorator import *
-except:
-    from decorator import * #For bad magic number errors in IDLE
+from lib.decorator import *
 tokens = {}
 session_timeout = 600 #Second(s)
 host  =("0.0.0.0", 8090)
@@ -30,7 +27,7 @@ class data(object):
                     f_obj.write(','.join([ usr if usr else 'admin' , hexmd5(pwd) if pwd else hexmd5(1234) ,
                                   '1' , '101'])+'\n')
                     f_obj.close()
-                    print('\nAdmin Sucessfully registered, server is running.')
+                    print('\nAdmin Sucessfully registered, Server is running....')
 
     def append(self,data):
         '''.append(self, [usrname,passwod , authentication]'''
@@ -159,6 +156,7 @@ DocXMLRPCServer.set_server_name(server,server_name='Client Server Network Bachma
 DocXMLRPCServer.set_server_documentation(server,server_documentation=doc)
 
 print('Bach-RPC Server Running on host: %s and Port: %s'%host)
+print('Server State: Solid  Node Status: Unimplimented')
 print('Logging is enabled , server started at: %s. \n'%(time.ctime(),))
 print('Hit Ctrl + C anytime to hault the server.\n')
 server.register_introspection_functions()

@@ -3,7 +3,7 @@ from xmlrpc.client import *
 transport = Transport()
 transport.user_agent = 'DeerdhPro2'
 import random
-xmlrpc = ServerProxy('http://localhost:8090/',
+xmlrpc = ServerProxy('http://13.127.197.225:8090/',
                                   allow_none=True, transport=transport)
 token = 0
 try:
