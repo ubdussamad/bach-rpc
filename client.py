@@ -13,7 +13,7 @@ try:
         token = str(a[1])
     else: raise
 except Exception as err:
-    print("Login test: Fail5!",err)
+    print("Login test: Fail!",err)
 
 try:
     b = xmlrpc.change_pwd('admin','1234','1234')
@@ -23,7 +23,7 @@ except Exception as err:
     print("Change key: Fail!")
     print(err)
 
-try:
+'''try:
     j = lambda: [random.randint(97,122) for i in range(8)]
     test_usr,pwd = 'test_'+''.join([chr(i) for i in j()]),''.join([chr(i) for i in j()])
     c = xmlrpc.register(test_usr,pwd)
@@ -32,8 +32,8 @@ try:
     else:
         raise
 except Exception as err:
-    print('Resgister user: Fail!',err)
-
+    print('Resgister user: Fail!',err)'''
+'''
 try:
     if all(xmlrpc.check_token(token)):print("Check Token: Pass!")
     else:raise
@@ -50,4 +50,4 @@ try:
     if not xmlrpc.check_users(token)[0]:print("Check Users: Pass!")
     else:raise
 except:
-    print('Check Users: Fail!')
+    print('Check Users: Fail!')'''
