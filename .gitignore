@@ -10,6 +10,10 @@ bin-release/
 #JSON Files
 *.json
 
+#Python Object Codes
+*.pyc
+
+
 # Executables
 *.swf
 *.air
