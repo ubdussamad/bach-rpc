@@ -1,9 +1,11 @@
 from xmlrpc.client import *
-
+import sys
 transport = Transport()
 transport.user_agent = 'DeerdhPro2'
 import random
-xmlrpc = ServerProxy('http://0.0.0.0:8090/',
+
+addr = sys.argv[1] if len(sys.argv) > 1 else "0.0.0.0"
+xmlrpc = ServerProxy('http://%s:8090/'%(addr,),
                                   allow_none=True, transport=transport)
 token = 0
 try:

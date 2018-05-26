@@ -118,7 +118,8 @@ class utils(object):
 			print("His auth is:",temp[usr][1])
 			token = hexmd5(time.time())[:7]
 			self.clear_token_cache(temp[usr][2]) #Last generated Token of the user will be cleared (If Valid)
-			self.__tokens[token] = [time.time(), int(temp[usr][1]) ,temp[usr][2]]
+			self.__tokens[token] = [time.time(), int(temp[usr][1])
+			 ,temp[usr][2]]
 			print( "Master Login!" if temp[usr][1] else '')
 			return 0,token,time.ctime()
 		else:
