@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from xmlrpc.server import *
 from lib.decorator import time_wrapper
-from lib.user_mgmt import utils
+from lib.user_mgmt import administration
 import sys,time
 
 try:
@@ -26,7 +26,7 @@ print('Server State: %s  Node Status: %s'%tuple(bach.split(',')))
 print('Logging is enabled , server started at: %s. \n'%(time.ctime(),))
 print('Hit Ctrl + C anytime to hault the server.\n')
 server.register_introspection_functions()
-server.register_instance( utils() )
+server.register_instance( administration() )
 
 try:
 	server.serve_forever()
