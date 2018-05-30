@@ -9,9 +9,7 @@ try:
 except:
 	bach = "Solid,Unimplimented"
 
-host  = tuple([sys.argv[1],int(sys.argv[2])]) if len(sys.argv)> 2 else ("0.0.0.0", 8090)
-	
-			
+host  = tuple( [ sys.argv[1] , int( sys.argv[2] ) ] ) if len(sys.argv) > 2 else ("0.0.0.0", 8090)	
 
 doc = '''This is a XML-RPC based Client Server for general method calls with high efficiency and low hastle.
 \n Copyright 2018 BachmanitY Inc.'''

@@ -32,10 +32,9 @@ class data(object):
 					print('\nAdmin Sucessfully registered, Server is running....')
 
 	def append(self,data):
-		'''.append(self, [usrname,password , authentication]'''
+		'''.append(self, [usrname, password , authentication]'''
 		assert len(data) == 3
 		with open(self.file,'a') as f_obj:
-			print('Auth is:',data[2])
 			new_user_id = max([int(self.peek()[usr][2]) for usr in self.peek()])
 			f_obj.write(','.join([data[0],hexmd5(data[1]),str(data[2]),str(new_user_id+1),'\n']))
 			f_obj.close()
@@ -165,6 +164,7 @@ class utils(object):
 				* lu  - List all  the users
 				* lt  - List all the current token
 				* ls  - List all available options    '''
+
 		if not all(self.check_token(token)):
 			return(1,'Denied!!')
 		if option=='des':
@@ -194,6 +194,7 @@ class utils(object):
 			return 0,"User %s Created, You may login using the given credentials."%(usr,)
 		else:
 			return 1,"Username Already Exists, Please try a different username."
+
 	def remove(self,token,usr,pwd):
 		temp_dir = self.credentials.peek()
 		if self.check_token(token)[0] and usr in temp_dir and hexmd5(pwd) == temp_dir[usr][0]:
