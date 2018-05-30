@@ -84,7 +84,7 @@ class data(object):
 	
 
 
-class utils(object):
+class administration(object):
 	
 	def __init__(self):
 		self.key = 0x00000
