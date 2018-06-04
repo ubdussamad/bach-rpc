@@ -1,24 +1,33 @@
-#include<stdio.h>
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
 
-
-main()
-{
-	
-	
-FILE *fp;
-fp = fopen("/home/samad/bach-rpc/C/cred.db", "r");
-char e;
-while (e != EOF) {
-
-	fscanf(fp, "%s" , e);
-	printf("1 : %s\n", e );
-	
-	
+int main(void){
+	//TODO: Impliment line by line checking system
 }
 
 
 
 
 
-fclose(fp);
+int load(void)
+{
+    FILE * fp;
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    fp = fopen("/home/samad/bach-rpc/C/cred.db", "r");
+    if (fp == NULL)
+        exit(EXIT_FAILURE);
+
+    while ((read = getline(&line, &len, fp)) != -1) {
+        printf("Retrieved line of length %zu :\n", read);
+        printf("%s", line);
+    }
+
+    fclose(fp);
+    if (line)
+        free(line);
+    exit(EXIT_SUCCESS);
 }
