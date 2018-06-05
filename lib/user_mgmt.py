@@ -7,8 +7,8 @@ session_timeout = 600 #Second(s)
 def hexmd5(x):
 	return md5(str(x).encode('utf-8')).hexdigest()
 
-def parent(dir,jumps=1):
-	for i in range(jumps):
+def parent(dir,hops=1):
+	for i in range(hops):
 		dir = os.path.dirname(dir)
 	return dir
 
