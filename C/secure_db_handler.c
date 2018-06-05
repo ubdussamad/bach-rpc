@@ -1,20 +1,18 @@
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 bool comp();
-int load();
-int strlength();
-char strslice();
+short load();
+short strlength();
+char * strslice();
+void slice_str();
+
 
 int main(int argc, char **argv){
 	//TODO: Impliment line by line checking system
-    //load(argv[1]);
-    char t[] = "samad";
-
-    printf("\n \n Slice is: %s \n\n", strslice(t,0,1) );
-
+    load(argv[1]);
     return(0);
 }
 
@@ -22,7 +20,7 @@ int main(int argc, char **argv){
 
 
 
-int load(char query[])
+short load(char query[])
 {
 
     FILE * fp;
@@ -30,28 +28,34 @@ int load(char query[])
     size_t len = 0;
     ssize_t read;
 
-    fp = fopen("/home/samad/bach-rpc/C/asrar.txt", "r");
+    fp = fopen("/home/samad/bach-rpc/C/s9.db", "r");
     if (fp == NULL)
         exit(EXIT_FAILURE);
+    //printf("The argument is:%s \n\n",query);
+    for ( short i = 0 ; (read = getline(&line, &len, fp))  != -1  ; i++) {
+        //printf("\n%d. %s", i, line);
 
-    printf("The argument is:%s \n\n",query);
+        short ref_i = 0;
 
-    for ( int i = 0 ; (read = getline(&line, &len, fp))  != -1  ; i++) {
-        printf("%d. %s", i, line);
+        for (short j=0; 1 ; j++){
 
-        int ref_i = 0;
 
-        for (int j=0; 1 ; j++){
             if ( line[j] == ',' ){
                 ref_i = j;
+                break;
             }
+        } 
+        
+        char buffer[ref_i+1];
 
-        printf("Ref: %d",ref_i); }
+        slice_str( line , buffer , 0 , ref_i-1 );
 
-        char temp[] = "";
+        //printf("\n  Index: %s and Query is: %s \n", buffer ,query);
 
-        for ( int l =0; l < ref_i ; l++){
-            continue;
+        //printf("\n %s \n",buffer);
+
+        if ( strcmp( query , buffer ) == 0) {
+            printf("\n User Exists \n");
         }
     }
 
@@ -64,25 +68,29 @@ int load(char query[])
 
 bool strcomp( char s1[] , char s2[] ) {
     if ( strlength(s1)  != strlength(s2)) {return(false);}
-    for (int k = 0 ; true ; k++ ){ if ( s1[k] == '\0' ) {
+    for (short k = 0 ; true ; k++ ){ if ( s1[k] == '\0' ) {
     return(true);}if(s1[k] != s2[k]){return(false); } } }
 
-int strlength(char string[]) {
-    int count = 0;while (1)  {
+short strlength(char string[]) {
+    short count = 0;while (1)  {
     if(string[count]=='\0'){break;}
     count++;}return(count);   }
 
-char strslice(char ch[] , int initial_index , int final_index ){
-    
+char * strslice(char ch[] , int initial_index , int final_index ){
     char slice[final_index - initial_index]; 
-    
-    int counter =  0;
-    
-    for ( int i = initial_index ; i < final_index ; i++) {
+    short counter =  0;
+    for ( short i = initial_index ; i < final_index ; i++) {
+        slice[counter] = ch[i]; counter++; }
+    char *string = slice;
+    return( string );
+}
 
-        slice[counter] = ch[i];
-        counter++;
+
+void slice_str(const char * str, char * buffer, size_t start, size_t end)
+{
+    size_t j = 0;
+    for ( size_t i = start; i <= end; ++i ) {
+        buffer[j++] = str[i];
     }
-    
-    return(slice);
+    buffer[j] = 0;
 }
