@@ -21,7 +21,6 @@
 */
 
 #define WIN32_LEAN_AND_MEAN  /* required by xmlrpc-c/server_abyss.h */
-
 #include <stdlib.h>
 #include <stdio.h>
 #ifdef _WIN32
