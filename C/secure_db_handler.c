@@ -11,21 +11,22 @@ long unsigned int last_usr();
 
 
 int main(int argc, char **argv){
-	//TODO: Impliment line by line checking system
 
-    char buffer[100];
-    user_query(argv[1],&buffer);
-    printf("\n%s\n",buffer);
-    /*if (argv[1] == 'a') {
+    if (strcmp(argv[1],"-a") == 0) {
         append_user(argv[2],argv[3],argv[4]);
     }
 
-    if (argv[1] = 'q'){
+    else if (strcmp(argv[1],"-q") == 0){
         char buffer[100];
         user_query(argv[2],&buffer);
-        printf(buffer);
+        printf("%s",buffer);
     }
-    */
+    else if (strcmp(argv[1],"-help") == 0){
+        printf("Usage: bach [OPTION]... [Args]...\nQuery/Append/Delete administrative database stored in local directory.\nOptions are sorted alphabetically\nArguments should be seprated by spaces.\n\n    OPTIONS |         ARGUMENTS       | DESCRIPTION\n\n      -q             [username]         Query the database for the \n                                        details of given username\n\n      -a      [username password auth]  Append new user to the \n                                        database.\n\nProject BachmanitY 2018.\nVisit : https://github.com/ubdussamad/bach-rpc for more details.\nAuthor: Ubdussamad <ubdussamad@gmail.com>.\nBach Simple Database Management System. \n");
+    }
+    else {
+        printf("bach: invalid option \'%s\'\nTry 'bach -help' for more information.\n",argv[1]);
+    }
     return (0);
 }
 
@@ -33,7 +34,7 @@ int main(int argc, char **argv){
 // Returns 0 if the query is valid else 1
 int user_query (char query[], char *ch) {
   FILE *fp;char *line = NULL;size_t len = 0;ssize_t read;
-  fp = fopen ("asrar.txt", "r");if (fp == NULL)
+  fp = fopen ("asrar.db", "r");if (fp == NULL)
   {exit (EXIT_FAILURE);}for (short i = 0; (read = getline (&line, &len,
   fp)) != -1; i++){short ref_i = 0; for (short j = 0; 1; j++){if (line[j] == ',')
   {ref_i = j;break;}} char buffer[ref_i + 1]; slice_str (line, buffer, 0,
@@ -45,10 +46,17 @@ int user_query (char query[], char *ch) {
 // Adds a new line to to the end of the file and return 0
 int append_user (char usr[] , char pwd[] , char auth[]){
     FILE *fp;
-    fp = fopen("asrar.txt", "a");
-    char buffer[ ( ( last_usr()+1 )%10 ) + 1];
-    //itoa(last_usr()+1, buffer, 10);
-    fprintf(fp, "%s,%s,%s,%s", usr , pwd , auth  , buffer) ;
+    fp = fopen("asrar.db", "a");
+    
+
+
+    const int n = snprintf(NULL, 0, "%lu", last_usr()+1);
+    char buf[n+1];
+    int c = snprintf(buf, n+1, "%lu", last_usr()+1);
+
+
+
+    fprintf(fp, "%s,%s,%s,%s\n", usr , pwd , auth  , buf) ;
     fclose(fp);
     return 0;
 }
@@ -56,7 +64,7 @@ int append_user (char usr[] , char pwd[] , char auth[]){
 //max username length is 50 characters
 long unsigned int last_usr(void ) {
     FILE *fd;
-    char filename[] = "asrar.txt";
+    char filename[] = "asrar.db";
     static const long max_len = 102;
     char buff[max_len + 1];
     if ((fd = fopen(filename, "rb")) != NULL)  {
