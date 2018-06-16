@@ -4,9 +4,13 @@ Simple XML-RPC Server for BACH
 # Introduction
 It uses the Python implimentation of XML RPC server and a Client.
 
-# Usage
+The credentials query is supposed to be handled by the C parser 
+for better performance and aglity.
 
-* Navigate to the clone or extracted directory in terminal
+# Basic Usage
+
+* Navigate to the clone or extracted directory in termina
+
 
 * Type: `python3 server.py`
 
@@ -18,6 +22,7 @@ It uses the Python implimentation of XML RPC server and a Client.
 
 * Other methods can be deduced from the code.
 
+** Note complete documentation can be found in the wiki page .**
 # Feedback
 
 Email me at: ubdussamad@gmail.com or slide a pull request.
