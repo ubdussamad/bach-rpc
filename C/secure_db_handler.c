@@ -10,20 +10,26 @@ void slice_str();
 long unsigned int last_usr();
 int del_entry();
 
+int max_line_len = 150;
 
 int main(int argc, char **argv){
-
+    char buffer[100];
     if (strcmp(argv[1],"-a") == 0) {
         append_user(argv[2],argv[3],argv[4]);
     }
 
+    else if (strcmp(argv[1],"-r") == 0){
+        printf("\n%d\n\n",user_query("/home/samad/bach-rpc/C/deleted.db",argv[2],&buffer));
+    }
+
     else if (strcmp(argv[1],"-q") == 0){
-        char buffer[100];
-        print("\n%d\n",user_query("deleted.db",argv[2],&buffer));
-        if (user_query("deleted.db",argv[2],&buffer) == 1) {
-            user_query("asrar.db",argv[2],&buffer); 
+        if (user_query("/home/samad/bach-rpc/C/deleted.db",argv[2],&buffer) == 1) {
+            user_query("/home/samad/bach-rpc/C/asrar.db",argv[2],&buffer);
+            printf("%s",buffer);
         }
-        printf("%s",buffer);
+        else{
+               printf("Bad User\n");
+        }
     }
 
     else if (strcmp(argv[1],"-d") == 0){
@@ -31,12 +37,12 @@ int main(int argc, char **argv){
 
     }
     else if (strcmp(argv[1],"-help") == 0){
-        printf("Usage: bach [OPTION]... [Args]...\nQuery/Append/Delete administrative database stored in local directory.\nOptions are sorted alphabetically\nArguments should be seprated by spaces.\n\n    OPTIONS |         ARGUMENTS       | DESCRIPTION\n\n      -q             [username]         Query the database for the \n                                        details of given username\n\n      -a      [username password auth]  Append new user to the \n                                        database.\n\nProject BachmanitY 2018.\nVisit : https://github.com/ubdussamad/bach-rpc for more details.\nAuthor: Ubdussamad <ubdussamad@gmail.com>.\nBach Simple Database Management System. \n");
+        printf("Usage: bach [OPTION]... [Args]...\nQuery/Append/Delete administrative database stored in local directory.\nOptions are sorted alphabetically\nArguments should be seprated by spaces.\n\n    OPTIONS |         ARGUMENTS       | DESCRIPTION\n\n      -q             [username]         Query the database for the \n                                        details of given username\n\n      -a      [username password auth]  Append new user to the \n                                        database.\n\n      -r             [username]         Delete user from database. \n \n\nProject BachmanitY 2018.\nVisit : https://github.com/ubdussamad/bach-rpc for more details.\nAuthor: Ubdussamad <ubdussamad@gmail.com>.\nBach Simple Database Management System. \n");
     }
     else {
         printf("bach: invalid option \'%s\'\nTry 'bach -help' for more information.\n",argv[1]);
     }
-    return (0);
+    return(0);
 }
 // Modifies the second parameter to the output genrated by the query */
 // Returns 0 if the query is valid else 1
@@ -99,7 +105,7 @@ int append_user (char usr[] , char pwd[] , char auth[]){
 //max username length is 50 characters
 long unsigned int last_usr(void ) {
     FILE *fd;
-    char filename[] = "asrar.db";
+    char filename[] = "/home/samad/bach-rpc/C/asrar.db";
     static const long max_len = 102;
     char buff[max_len + 1];
     if ((fd = fopen(filename, "rb")) != NULL)  {
@@ -141,9 +147,9 @@ void slice_str(const char * str, char * buffer, size_t start, size_t end) {
 // actions for now.
 int del_entry(char * usr) {
     FILE *fp;
-    char buf[150];
-    fp = fopen("deleted.db", "a");
-    user_query("asrar.db",usr,buf);
+    char buf[max_line_len];
+    fp = fopen("/home/samad/bach-rpc/C/deleted.db", "a");
+    user_query("/home/samad/bach-rpc/C/asrar.db",usr,buf);
     fprintf(fp, "%s,%s\n", usr , buf) ;
     fclose(fp);
     return(0);
